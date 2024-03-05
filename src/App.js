@@ -1,24 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Dashboard from "./Dashboard";
+import {Route, RouterProvider, createBrowserRouter, createRoutesFromElements} from "react-router-dom";
+import Rootlayout from "./Rootlayout";
+import Home from "./Home";
+import { DataContext } from "./DataContext";
+import { useState,useEffect } from "react";
+import EmployeeDetails from "./EmployeeDetails";
+
+let router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Rootlayout />}>
+      <Route index element={<Home />} />
+      <Route path="/employees" element={<Dashboard />} />
+      <Route path="/employee/:id" element={<EmployeeDetails />} />
+    </Route>
+  )
+)
+
 
 function App() {
+
+  const [details ,setDetails] = useState([]);
+  
+  useEffect(() => {
+        
+    fetch("https://jsonplaceholder.typicode.com/users")
+                         .then(res => res.json())
+                         .then(data => {
+                            setDetails(data);
+                           // setData(data);
+                           // setFilteredData(data);
+                         })
+                        .catch (err => console.log(err));
+         
+},[]);
+
+  
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DataContext.Provider value={[details,setDetails]}>
+      <RouterProvider router={router}/>
+    </DataContext.Provider>
   );
 }
 
